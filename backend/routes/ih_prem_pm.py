@@ -271,7 +271,12 @@ async def upload_prem_pm_csv(file: UploadFile = File(...)):
 
                 # Convert numeric fields
                 # row['eq_num'] = int(row['eq_num']) if row.get('eq_num') else None
-                row['frequency'] = int(row.get('frequency'))
+                # frequency can be empty or malformed; use to_float then int safely
+                if row.get('frequency'):
+                    fv = to_float(row.get('frequency'))
+                    row['frequency'] = int(fv) if fv is not None else None
+                else:
+                    row['frequency'] = None
 
                 row['manpower_sm_eq'] = to_float(row['manpower_sm_eq']) if row.get('manpower_sm_eq') else None
                 row['manpower_med_eq'] = to_float(row['manpower_med_eq']) if row.get('manpower_med_eq') else None
