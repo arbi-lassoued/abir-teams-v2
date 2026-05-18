@@ -523,7 +523,7 @@ async def upload_equipment_csv(file: UploadFile = File(...)):
         except UnicodeDecodeError:
             csv_string = StringIO(contents.decode('latin1'))
             
-        csv_reader = csv.DictReader(csv_string, delimiter=';')  
+        csv_reader = csv.DictReader(csv_string, delimiter=delimiter)  
         print("CSV Header Fields:", csv_reader.fieldnames) 
         
         # Clean fieldnames (remove BOM and whitespace)
@@ -557,6 +557,7 @@ async def upload_equipment_csv(file: UploadFile = File(...)):
                 # Insert into database (replace with your actual table and columns)
                 insert_query = equipments.insert().values(
                     equipment_description=row.get('equipment_description'),
+                    asset_description=row.get('equipment_description'),  # Use same as equipment_description
                     equipment_class_category=row.get('equipment_class_category'),
                     sub_equipment_class_code=row.get('sub_equipment_class_code'),
                     sub_equipment_class_desc=row.get('sub_equipment_class_desc'),

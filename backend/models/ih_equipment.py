@@ -7,7 +7,8 @@ from datetime import datetime
 equipments = Table(
     'in_house_equipment_table', meta,           
     Column('ih_eq_id',Integer, unique=True, primary_key=True,autoincrement=True), 
-    Column('equipment_description',String(100), nullable=True, default=""),     
+    Column('equipment_description',String(100), nullable=True, default=""),
+    Column('asset_description',String(100), nullable=True, default=""),     
     Column('equipment_class_category',String(100), nullable=True, default=""), 
     Column('sub_equipment_class_code',String(100), nullable=True, default=""),
     Column('sub_equipment_class_desc',String(100), nullable=True, default=""), 

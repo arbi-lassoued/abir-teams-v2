@@ -11,15 +11,57 @@ Plateforme de gestion des équipements et de la maintenance en maison (In-House)
 
 ---
 
-## 📋 Étapes d'exécution du projet
+## ⚡ Démarrage rapide (Copier-Coller)
+
+### Terminal 1 - Backend
+
+```bash
+cd backend
+python -m pip install -r requirements.txt
+python index.py
+```
+
+**Attendez le message:** `Uvicorn running on http://127.0.0.1:8001`
+
+### Terminal 2 - Frontend (ouvrir un NOUVEAU terminal)
+
+```bash
+cd frontend/tenams
+npm install
+npm run dev
+```
+
+**Attendez le message:** `Local: http://localhost:5173/`
+
+---
+
+### 🔄 Option: Nettoyer les données au démarrage
+
+Si vous voulez supprimer toutes les données importées **à chaque démarrage** du backend:
+
+**Terminal 1 - Backend AVEC NETTOYAGE:**
+
+```bash
+cd backend
+python -m pip install -r requirements.txt
+RESET_DB=true python index.py
+```
+
+Cela réinitialisera la base de données et les données CSV importées seront supprimées.
+
+---
+
+## 📋 Exécution manuelle détaillée
 
 ### Phase 1: Configuration du Backend (SQLite temporaire)
 
 #### 1.1 Installer les dépendances Python
 
+Ouvrez un terminal dans le dossier racine du projet et exécutez:
+
 ```bash
 cd backend
-py -3.10 -m pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 **Packages installés:**
@@ -37,27 +79,32 @@ py -3.10 -m pip install -r requirements.txt
 #### 1.2 Lancer le serveur FastAPI
 
 ```bash
-py -3.10 index.py
+python index.py
 ```
 
 **Résultat attendu:**
 ```
-✓ INFO:     Started server process
-✓ INFO:     Waiting for application startup.
-✓ INFO:     Application startup complete.
-✓ INFO:     Uvicorn running on http://127.0.0.1:8001
+Role already exists: Administrator
+Roles inserted successfully.
+✓ Admin user already exists
+INFO:     Started server process [XXXX]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8001 (Press CTRL+C to quit)
 ```
 
 **Points d'accès:**
-- API REST: `http://127.0.0.1:8001`
-- Swagger UI (Documentation): `http://127.0.0.1:8001/docs`
-- ReDoc: `http://127.0.0.1:8001/redoc`
+- API REST: **http://127.0.0.1:8001**
+- Swagger UI (Documentation): **http://127.0.0.1:8001/docs**
+- ReDoc: **http://127.0.0.1:8001/redoc**
 
 ---
 
 ### Phase 2: Configuration du Frontend (Vite + React)
 
 #### 2.1 Installer les dépendances npm
+
+Ouvrez un **NOUVEAU terminal** et exécutez:
 
 ```bash
 cd frontend/tenams
@@ -72,11 +119,13 @@ npm run dev
 
 **Résultat attendu:**
 ```
-✓ VITE v7.1.9 ready in 3448 ms
-✓ Local:   http://localhost:5173/
+  VITE v7.1.9  ready in 1785 ms
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
 ```
 
-**URL d'accès:** `http://localhost:5173/`
+**URL d'accès:** **http://localhost:5173/**
 
 ---
 
@@ -118,6 +167,77 @@ Vous pourrez ensuite vous connecter avec vos identifiants créés.
 
 ---
 
+## 🧹 Utilitaires - Nettoyer les données CSV importées
+
+### ⚠️ Important: Le nettoyage N'est PAS automatique
+
+Les données importées via CSV **persistent** à chaque redémarrage du backend. Vous devez **nettoyer manuellement** si vous le souhaitez.
+
+### Option 1: Script automatique (recommandé)
+
+Avant de lancer le backend, ouvrez un terminal dans le dossier `backend` et exécutez:
+
+```bash
+python clear_all_data.py
+```
+
+**Résultat attendu:**
+```
+==================================================
+📊 Data Before Cleanup:
+==================================================
+  • Equipment: 228 records
+  • Planned Maintenance: 175 records
+  • Spare Parts: 570 records
+  • Total: 973 records
+
+==================================================
+✅ Data After Cleanup:
+==================================================
+  • Equipment: 0 records (deleted 228)
+  • Planned Maintenance: 0 records (deleted 175)
+  • Spare Parts: 0 records (deleted 570)
+  • Total: 0 records
+
+✨ All CSV data cleared successfully!
+```
+
+### Option 2: Script interactif
+
+Pour plus de contrôle:
+
+```bash
+cd backend
+python clean_data.py
+```
+
+Sélectionnez l'option que vous préférez:
+- **1**: Clear ALL data
+- **2**: Clear Equipment only
+- **3**: Clear Maintenance Plans only
+- **4**: Clear Spare Parts only
+- **5**: Exit (no changes)
+
+### Option 3: Réinitialiser complètement la base de données
+
+Si vous voulez une base de données complètement vierge (y compris les users):
+
+**Windows:**
+```powershell
+Remove-Item backend/tenams.db -Force
+python index.py
+```
+
+**Linux/Mac:**
+```bash
+rm backend/tenams.db
+python index.py
+```
+
+Le backend créera une nouvelle base de données avec l'admin par défaut.
+
+---
+
 ## 📁 Architecture du projet
 
 ```
@@ -147,6 +267,97 @@ abir/
 ├── MYSQL_RESTORATION.md             # Guide pour revenir à MySQL
 └── README.md                         # Ce fichier
 ```
+
+---
+
+## ⚙️ Commandes utiles
+
+### Backend (Python)
+
+| Commande | Description |
+|----------|-------------|
+| `python index.py` | Lancer le serveur FastAPI |
+| `RESET_DB=true python index.py` | Lancer et réinitialiser la BD au démarrage |
+| `python clear_all_data.py` | Nettoyer toutes les données CSV |
+| `python clean_data.py` | Menu interactif pour nettoyer les données |
+| `python -m pip install -r requirements.txt` | Installer/mettre à jour les dépendances |
+
+### Frontend (npm)
+
+| Commande | Description |
+|----------|-------------|
+| `npm run dev` | Lancer le serveur de développement |
+| `npm run build` | Construire l'application pour la production |
+| `npm run lint` | Vérifier la syntaxe du code |
+| `npm audit` | Vérifier les vulnérabilités des dépendances |
+
+---
+
+## 🐛 Troubleshooting
+
+### Le backend ne démarre pas
+
+**Vérifier Python:**
+```bash
+python --version
+```
+
+Assurez-vous que Python 3.10+ est installé.
+
+**Réinstaller les dépendances:**
+```bash
+cd backend
+python -m pip install --upgrade -r requirements.txt
+```
+
+### Le port 8001 est déjà utilisé
+
+Trouvez le processus qui utilise le port:
+```powershell
+netstat -ano | findstr :8001
+```
+
+Terminez le processus:
+```powershell
+taskkill /PID <PID> /F
+```
+
+### Le frontend ne démarre pas
+
+**Clear npm cache:**
+```bash
+npm cache clean --force
+cd frontend/tenams
+rm -r node_modules package-lock.json
+npm install
+npm run dev
+```
+
+### Accès refusé à la base de données
+
+Supprimez le fichier `tenams.db` et redémarrez le backend:
+```bash
+rm backend/tenams.db
+python index.py
+```
+
+---
+
+## 📝 Notes importantes
+
+- ✅ La base de données SQLite est créée automatiquement
+- ✅ L'utilisateur admin est créé automatiquement au démarrage
+- ⚠️ Les données sont synchronisées en temps réel entre frontend et backend
+- ⚠️ N'utilisez pas en production sans changer le mot de passe admin
+
+---
+
+## 📞 Support
+
+Pour toute question ou problème:
+1. Vérifiez les logs du terminal
+2. Consultez la documentation Swagger: **http://127.0.0.1:8001/docs**
+3. Vérifiez les fichiers de configuration dans `db.py`
 
 ---
 

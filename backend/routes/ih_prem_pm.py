@@ -52,7 +52,7 @@ def post_prem_pm(prem_pm: IHPremPMCreate):
             manpower_lg_eq=prem_pm.manpower_lg_eq,
 
             workload_per_sm_eq_task=prem_pm.workload_per_sm_eq_task,
-            workload_per__med_eqtask=prem_pm.workload_per_med_eq_task,
+            workload_per_med_eq_task=prem_pm.workload_per_med_eq_task,
             workload_per_lg_eq_task=prem_pm.workload_per_lg_eq_task,
 
             task_occurrence_per_year=prem_pm.task_occurrence_per_year,
@@ -225,7 +225,7 @@ def detect_delimiter(sample):
     for delimiter in [',', ';', '\t']:
         try:
             reader = csv.DictReader(StringIO(sample.decode('utf-8')), delimiter=delimiter)
-            if 'eq_num' in next(reader):
+            if reader.fieldnames and any(field in reader.fieldnames for field in ['maint_state', 'equipment_class_category', 'sub_equipment_class_code']):
                 return delimiter
         except Exception:
             continue
@@ -235,12 +235,15 @@ def detect_delimiter(sample):
 async def upload_prem_pm_csv(file: UploadFile = File(...)):
     try:    
         contents = await file.read()
+        delimiter = detect_delimiter(contents)
+        if delimiter is None:
+            raise HTTPException(status_code=400, detail="Could not detect CSV delimiter")
         # csv_string = StringIO(contents.decode('utf-8'))
         try:
             csv_string = StringIO(contents.decode('utf-8'))
         except UnicodeDecodeError:
             csv_string = StringIO(contents.decode('latin1'))
-        csv_reader = csv.DictReader(csv_string, delimiter=';')  
+        csv_reader = csv.DictReader(csv_string, delimiter=delimiter)  
         print("CSV Header Fields:", csv_reader.fieldnames) 
         csv_reader.fieldnames = [field.strip().lstrip('\ufeff') for field in csv_reader.fieldnames]
         
